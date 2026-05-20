@@ -123,64 +123,86 @@ export async function POST(request: NextRequest) {
       return corsHeaders(response);
     }
 
-    // Improved search through knowledge base
+    // Enhanced search with intent detection
     const searchQuery = query.toLowerCase();
-    const queryWords = searchQuery.split(/\s+/);
+    const queryWords = searchQuery.split(/\s+/).filter((w: string) => w.length > 0);
     
+    // Define keywords for different intents
+    const keywordMap: { [key: string]: string[] } = {
+      interview: ['interview', 'prep', 'questions', 'technical', 'behavioral', 'mock', 'screening'],
+      mentoring: ['mentoring', 'mentor', 'expert', 'coach', 'guidance', 'experienced'],
+      coaching: ['coaching', 'program', 'leadership', 'career', 'transition', 'startup'],
+      tools: ['tool', 'tools', 'marketplace', 'builder', 'optimizer', 'system', 'design'],
+      pricing: ['price', 'pricing', 'cost', 'free', 'money', 'pay', 'afford', 'bundle'],
+      resume: ['resume', 'cv', 'profile', 'linkedin', 'atp'],
+      questions: ['question', 'answer', 'database', 'video'],
+      general: ['service', 'product', 'offer', 'have', 'do', 'help', 'what']
+    };
+    
+    // Detect intent from query
+    const detectedIntents: string[] = [];
+    Object.entries(keywordMap).forEach(([intent, keywords]) => {
+      if (keywords.some((keyword: string) => queryWords.includes(keyword))) {
+        detectedIntents.push(intent);
+      }
+    });
+
     const results = knowledgeBase
       .map(item => {
         const titleLower = item.title.toLowerCase();
         const contentLower = item.content.toLowerCase();
         let score = 0;
         
-        // Check for exact matches
-        if (titleLower.includes(searchQuery)) score += 10;
-        if (contentLower.includes(searchQuery)) score += 5;
+        // Exact phrase match
+        if (titleLower.includes(searchQuery)) score += 15;
+        if (contentLower.includes(searchQuery)) score += 10;
         
-        // Check for word matches
+        // Word-based matching
         queryWords.forEach((word: string) => {
           if (word.length > 2) {
-            if (titleLower.includes(word)) score += 3;
-            if (contentLower.includes(word)) score += 1;
+            if (titleLower.includes(word)) score += 5;
+            if (contentLower.includes(word)) score += 2;
           }
         });
         
-        // Check category matches
-        if (item.category.toLowerCase().includes(searchQuery)) score += 8;
-        queryWords.forEach((word: string) => {
-          if (item.category.toLowerCase().includes(word)) score += 2;
+        // Intent-based matching
+        detectedIntents.forEach(intent => {
+          const itemTitle = titleLower;
+          const itemContent = contentLower;
+          const itemCategory = item.category?.toLowerCase();
+          
+          if (intent === 'interview' && (itemTitle.includes('interview') || itemCategory === 'tools')) score += 4;
+          if (intent === 'mentoring' && (itemTitle.includes('mentor') || itemCategory === 'services')) score += 4;
+          if (intent === 'coaching' && itemTitle.includes('coaching')) score += 4;
+          if (intent === 'tools' && (itemCategory === 'tools' || itemTitle.includes('marketplace'))) score += 4;
+          if (intent === 'pricing' && (itemCategory === 'pricing' || itemContent.includes('price') || itemContent.includes('cost'))) score += 6;
+          if (intent === 'resume' && (itemTitle.includes('resume') || itemTitle.includes('linkedin'))) score += 5;
+          if (intent === 'questions' && itemTitle.includes('question')) score += 5;
         });
         
         return { item, score };
       })
       .filter(({ score }) => score > 0)
       .sort((a, b) => b.score - a.score)
-      .slice(0, 3)
+      .slice(0, detectedIntents.length > 0 ? 2 : 3)
       .map(({ item }) => ({
         title: item.title,
         content: item.content,
         url: item.url
       }));
 
-    // If no results found, return all service categories for broader context
-    const finalResults = results.length > 0 ? results : knowledgeBase
-      .filter(item => item.category === 'services')
-      .slice(0, 3)
-      .map(item => ({
-        title: item.title,
-        content: item.content,
-        url: item.url
-      }));
+    // If still no results, provide helpful suggestions
+    const finalResults = results.length > 0 ? results : [
+      {
+        title: 'Our Main Services',
+        content: 'We offer Interview Preparation, Mentoring Programs, Professional Coaching, and a Tool Marketplace. What would you like to know more about?',
+        url: '/'
+      }
+    ];
 
     const response = NextResponse.json(
       {
-        results: finalResults.length > 0 ? finalResults : [
-          {
-            title: 'CareerMentor Platform',
-            content: 'Welcome to CareerMentor! We offer comprehensive interview preparation, professional mentoring, executive coaching, and premium career tools to help you succeed.',
-            url: '/'
-          }
-        ]
+        results: finalResults
       },
       { status: 200 }
     );
