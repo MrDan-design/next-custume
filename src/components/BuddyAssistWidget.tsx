@@ -85,7 +85,7 @@ export default function BuddyAssistWidget() {
       {/* Chat Widget Button */}
       <button
         onClick={() => setIsOpen(!isOpen)}
-        className="fixed bottom-4 right-4 sm:bottom-6 sm:right-6 z-50 w-14 h-14 sm:w-16 sm:h-16 rounded-full bg-gradient-to-br from-purple-600 to-blue-600 text-white shadow-lg hover:shadow-xl transition-all duration-300 transform hover:scale-110 flex items-center justify-center border-4 border-white hover:border-purple-200 active:scale-95"
+        className="fixed bottom-4 right-4 sm:bottom-6 sm:right-6 z-[9999] w-14 h-14 sm:w-16 sm:h-16 rounded-full bg-gradient-to-br from-purple-600 to-blue-600 text-white shadow-lg hover:shadow-xl transition-all duration-300 transform hover:scale-110 flex items-center justify-center border-4 border-white hover:border-purple-200 active:scale-95"
         title="Chat with CareerMentor Assistant"
         aria-label="Open chat assistant"
       >
@@ -105,12 +105,17 @@ export default function BuddyAssistWidget() {
         <>
           {/* Mobile backdrop */}
           <div
-            className="fixed inset-0 sm:hidden z-40 bg-black bg-opacity-30 transition-opacity duration-300"
+            className="fixed inset-0 sm:hidden z-[9998] bg-black bg-opacity-30 transition-opacity duration-300"
             onClick={() => setIsOpen(false)}
           />
           
           {/* Chat Panel */}
-          <div className="fixed bottom-0 left-0 right-0 sm:bottom-auto sm:right-4 sm:left-auto z-50 sm:top-auto w-full sm:w-80 md:w-96 max-w-full bg-white rounded-t-3xl sm:rounded-2xl shadow-2xl border-t sm:border border-gray-200 flex flex-col h-[80vh] sm:h-[600px] md:h-[650px] overflow-hidden">
+          <div className="fixed bottom-0 left-0 right-0 sm:bottom-auto sm:right-4 sm:left-auto z-[9999] sm:top-auto w-full sm:w-80 md:w-96 max-w-full bg-white rounded-t-3xl sm:rounded-2xl shadow-2xl border-t sm:border border-gray-200 flex flex-col h-[80vh] sm:h-[600px] md:h-[650px] overflow-hidden">
+            {/* Powered By Badge */}
+            <div className="bg-gradient-to-r from-purple-700 to-blue-700 text-white px-4 sm:px-6 py-2 flex-shrink-0 text-center">
+              <p className="text-xs font-semibold tracking-wide">✨ Powered by Buddy Assist</p>
+            </div>
+
             {/* Header */}
             <div className="bg-gradient-to-r from-purple-600 to-blue-600 text-white px-4 sm:px-6 py-4 sm:py-5 flex-shrink-0 flex items-center justify-between">
               <div className="flex-1">
