@@ -123,15 +123,49 @@ export async function POST(request: NextRequest) {
       return corsHeaders(response);
     }
 
-    // Simple search through knowledge base
+    // Improved search through knowledge base
     const searchQuery = query.toLowerCase();
+    const queryWords = searchQuery.split(/\s+/);
+    
     const results = knowledgeBase
-      .filter(item => 
-        item.title.toLowerCase().includes(searchQuery) ||
-        item.content.toLowerCase().includes(searchQuery) ||
-        item.category.toLowerCase().includes(searchQuery)
-      )
-      .slice(0, 10)
+      .map(item => {
+        const titleLower = item.title.toLowerCase();
+        const contentLower = item.content.toLowerCase();
+        let score = 0;
+        
+        // Check for exact matches
+        if (titleLower.includes(searchQuery)) score += 10;
+        if (contentLower.includes(searchQuery)) score += 5;
+        
+        // Check for word matches
+        queryWords.forEach((word: string) => {
+          if (word.length > 2) {
+            if (titleLower.includes(word)) score += 3;
+            if (contentLower.includes(word)) score += 1;
+          }
+        });
+        
+        // Check category matches
+        if (item.category.toLowerCase().includes(searchQuery)) score += 8;
+        queryWords.forEach((word: string) => {
+          if (item.category.toLowerCase().includes(word)) score += 2;
+        });
+        
+        return { item, score };
+      })
+      .filter(({ score }) => score > 0)
+      .sort((a, b) => b.score - a.score)
+      .slice(0, 3)
+      .map(({ item }) => ({
+        title: item.title,
+        content: item.content,
+        url: item.url
+      }));
+
+    // If no results found, return all service categories for broader context
+    const finalResults = results.length > 0 ? results : knowledgeBase
+      .filter(item => item.category === 'services')
+      .slice(0, 3)
       .map(item => ({
         title: item.title,
         content: item.content,
@@ -140,7 +174,7 @@ export async function POST(request: NextRequest) {
 
     const response = NextResponse.json(
       {
-        results: results.length > 0 ? results : [
+        results: finalResults.length > 0 ? finalResults : [
           {
             title: 'CareerMentor Platform',
             content: 'Welcome to CareerMentor! We offer comprehensive interview preparation, professional mentoring, executive coaching, and premium career tools to help you succeed.',
