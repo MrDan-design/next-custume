@@ -2,7 +2,7 @@ import type { Metadata } from "next";
 import "./globals.css";
 import Navigation from "@/components/Navigation";
 import Footer from "@/components/Footer";
-import BuddyAssistWidget from "@/components/BuddyAssistWidget";
+import ChatWidget from "@/components/ChatWidget";
 
 export const metadata: Metadata = {
   title: "CareerMentor - Interview, Mentoring & Coaching Platform",
@@ -22,7 +22,7 @@ export default function RootLayout({
           {children}
         </main>
         <Footer />
-        <BuddyAssistWidget />
+        <ChatWidget />
       </body>
     </html>
   );
