@@ -13,7 +13,7 @@ export default function BuddyAssistWidget() {
   const [messages, setMessages] = useState<Message[]>([
     {
       type: 'assistant',
-      content: 'Hello! 👋 I\'m your CareerMentor assistant. Ask me anything about our services, tools, or how to get started!'
+      content: 'Hi there! 👋 I\'m your CareerMentor assistant. Ask me about interviews, mentoring, coaching, or our tools.'
     }
   ]);
   const [input, setInput] = useState('');
@@ -85,50 +85,67 @@ export default function BuddyAssistWidget() {
       {/* Chat Widget Button */}
       <button
         onClick={() => setIsOpen(!isOpen)}
-        className="fixed bottom-6 right-6 z-50 bg-gradient-to-r from-purple-600 to-blue-600 text-white rounded-full p-4 shadow-lg hover:shadow-xl transition transform hover:scale-110"
+        className="fixed bottom-6 right-6 z-50 w-16 h-16 rounded-full bg-gradient-to-br from-purple-600 to-blue-600 text-white shadow-2xl hover:shadow-2xl transition-all duration-300 transform hover:scale-110 flex items-center justify-center border-4 border-white"
         title="Chat with CareerMentor Assistant"
       >
         {isOpen ? (
-          <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <svg className="w-7 h-7" fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
           </svg>
         ) : (
-          <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z" />
-          </svg>
+          <div className="flex flex-col items-center gap-0.5">
+            <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z" />
+            </svg>
+          </div>
         )}
       </button>
 
-      {/* Chat Widget */}
+      {/* Chat Widget Panel */}
       {isOpen && (
-        <div className="fixed bottom-24 right-6 z-50 w-96 max-w-sm bg-white rounded-lg shadow-2xl border-2 border-gray-200 flex flex-col h-96 md:h-[500px]">
+        <div className="fixed bottom-28 right-6 z-50 w-96 max-w-sm bg-white rounded-2xl shadow-2xl border border-gray-200 flex flex-col h-[600px] md:h-[700px] overflow-hidden">
           {/* Header */}
-          <div className="bg-gradient-to-r from-purple-600 to-blue-600 text-white p-4 rounded-t-lg">
-            <h3 className="font-bold text-lg">CareerMentor Assistant</h3>
-            <p className="text-sm text-gray-100">Ask anything about our services</p>
+          <div className="bg-gradient-to-r from-purple-600 to-blue-600 text-white p-6 flex-shrink-0">
+            <div className="flex items-center justify-between mb-2">
+              <div>
+                <h3 className="font-black text-lg">CareerMentor Assistant</h3>
+                <p className="text-sm text-purple-100">Always here to help</p>
+              </div>
+              <div className="w-10 h-10 rounded-full bg-white bg-opacity-20 flex items-center justify-center text-lg">
+                🎯
+              </div>
+            </div>
           </div>
 
-          {/* Messages */}
-          <div className="flex-1 overflow-y-auto p-4 space-y-4">
+          {/* Messages Container */}
+          <div className="flex-1 overflow-y-auto p-6 space-y-4 bg-gray-50">
             {messages.map((msg, idx) => (
               <div key={idx} className={`flex ${msg.type === 'user' ? 'justify-end' : 'justify-start'}`}>
                 <div
-                  className={`max-w-xs lg:max-w-md px-4 py-2 rounded-lg ${
+                  className={`max-w-xs lg:max-w-md px-5 py-3 rounded-2xl ${
                     msg.type === 'user'
-                      ? 'bg-purple-600 text-white rounded-br-none'
-                      : 'bg-gray-100 text-gray-900 rounded-bl-none'
+                      ? 'bg-gradient-to-r from-purple-600 to-blue-600 text-white rounded-br-none shadow-md'
+                      : 'bg-white text-slate-900 rounded-bl-none border-2 border-gray-200 shadow-sm'
                   }`}
                 >
-                  <p className="text-sm whitespace-pre-wrap">{msg.content}</p>
+                  <p className={`text-sm leading-relaxed ${msg.type === 'user' ? 'text-white' : 'text-slate-900'}`}>
+                    {msg.content}
+                  </p>
                   {msg.results && msg.results.length > 0 && (
-                    <div className="mt-3 space-y-2">
+                    <div className="mt-4 space-y-2 pt-4 border-t border-gray-300">
                       {msg.results.map((result, i) => (
                         <a
                           key={i}
                           href={result.url}
-                          className="block text-xs bg-white text-purple-600 p-2 rounded hover:bg-purple-50 transition"
+                          className="flex items-start gap-2 p-3 rounded-lg bg-gray-100 hover:bg-gradient-to-r hover:from-purple-100 hover:to-blue-100 transition group"
                         >
-                          <strong>{result.title}</strong>
+                          <span className="text-lg flex-shrink-0">📌</span>
+                          <div>
+                            <p className="font-bold text-slate-900 text-xs group-hover:text-purple-600 transition">
+                              {result.title}
+                            </p>
+                            <p className="text-xs text-gray-600 line-clamp-2">{result.content.substring(0, 60)}...</p>
+                          </div>
                         </a>
                       ))}
                     </div>
@@ -138,11 +155,11 @@ export default function BuddyAssistWidget() {
             ))}
             {isLoading && (
               <div className="flex justify-start">
-                <div className="bg-gray-100 text-gray-900 px-4 py-2 rounded-lg rounded-bl-none">
-                  <div className="flex gap-1">
-                    <div className="w-2 h-2 bg-gray-400 rounded-full animate-bounce"></div>
-                    <div className="w-2 h-2 bg-gray-400 rounded-full animate-bounce" style={{ animationDelay: '0.1s' }}></div>
-                    <div className="w-2 h-2 bg-gray-400 rounded-full animate-bounce" style={{ animationDelay: '0.2s' }}></div>
+                <div className="bg-white border-2 border-gray-200 text-slate-900 px-5 py-3 rounded-2xl rounded-bl-none shadow-sm">
+                  <div className="flex gap-2 items-center">
+                    <div className="w-2 h-2 bg-purple-600 rounded-full animate-bounce"></div>
+                    <div className="w-2 h-2 bg-purple-600 rounded-full animate-bounce" style={{ animationDelay: '0.1s' }}></div>
+                    <div className="w-2 h-2 bg-purple-600 rounded-full animate-bounce" style={{ animationDelay: '0.2s' }}></div>
                   </div>
                 </div>
               </div>
@@ -150,23 +167,27 @@ export default function BuddyAssistWidget() {
             <div ref={messagesEndRef} />
           </div>
 
-          {/* Input */}
-          <form onSubmit={handleSendMessage} className="border-t p-4 flex gap-2">
-            <input
-              type="text"
-              value={input}
-              onChange={(e) => setInput(e.target.value)}
-              placeholder="Ask a question..."
-              className="flex-1 px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:border-purple-600 text-sm"
-              disabled={isLoading}
-            />
-            <button
-              type="submit"
-              disabled={isLoading}
-              className="bg-purple-600 hover:bg-purple-700 text-white px-4 py-2 rounded-lg transition disabled:opacity-50 font-semibold text-sm"
-            >
-              Send
-            </button>
+          {/* Input Area */}
+          <form onSubmit={handleSendMessage} className="border-t border-gray-200 p-4 bg-white flex-shrink-0">
+            <div className="flex gap-2">
+              <input
+                type="text"
+                value={input}
+                onChange={(e) => setInput(e.target.value)}
+                placeholder="Ask a question..."
+                className="flex-1 px-4 py-3 rounded-xl border-2 border-gray-300 focus:border-purple-500 focus:outline-none text-sm text-slate-900 placeholder-gray-500 font-medium transition"
+                disabled={isLoading}
+              />
+              <button
+                type="submit"
+                disabled={isLoading}
+                className="bg-gradient-to-r from-purple-600 to-blue-600 hover:from-purple-700 hover:to-blue-700 text-white px-4 py-3 rounded-xl transition disabled:opacity-50 font-bold text-sm shadow-md transform hover:scale-105"
+              >
+                <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 19l9 2-9-18-9 18 9-2zm0 0v-8" />
+                </svg>
+              </button>
+            </div>
           </form>
         </div>
       )}
