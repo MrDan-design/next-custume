@@ -85,112 +85,143 @@ export default function BuddyAssistWidget() {
       {/* Chat Widget Button */}
       <button
         onClick={() => setIsOpen(!isOpen)}
-        className="fixed bottom-6 right-6 z-50 w-16 h-16 rounded-full bg-gradient-to-br from-purple-600 to-blue-600 text-white shadow-2xl hover:shadow-2xl transition-all duration-300 transform hover:scale-110 flex items-center justify-center border-4 border-white"
+        className="fixed bottom-4 right-4 sm:bottom-6 sm:right-6 z-50 w-14 h-14 sm:w-16 sm:h-16 rounded-full bg-gradient-to-br from-purple-600 to-blue-600 text-white shadow-lg hover:shadow-xl transition-all duration-300 transform hover:scale-110 flex items-center justify-center border-4 border-white hover:border-purple-200 active:scale-95"
         title="Chat with CareerMentor Assistant"
+        aria-label="Open chat assistant"
       >
         {isOpen ? (
-          <svg className="w-7 h-7" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+          <svg className="w-6 h-6 sm:w-7 sm:h-7" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M6 18L18 6M6 6l12 12" />
           </svg>
         ) : (
-          <div className="flex flex-col items-center gap-0.5">
-            <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z" />
-            </svg>
-          </div>
+          <svg className="w-6 h-6 sm:w-7 sm:h-7" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z" />
+          </svg>
         )}
       </button>
 
-      {/* Chat Widget Panel */}
+      {/* Chat Widget Panel - Fully Responsive */}
       {isOpen && (
-        <div className="fixed bottom-28 right-6 z-50 w-96 max-w-sm bg-white rounded-2xl shadow-2xl border border-gray-200 flex flex-col h-[600px] md:h-[700px] overflow-hidden">
-          {/* Header */}
-          <div className="bg-gradient-to-r from-purple-600 to-blue-600 text-white p-6 flex-shrink-0">
-            <div className="flex items-center justify-between mb-2">
-              <div>
-                <h3 className="font-black text-lg">CareerMentor Assistant</h3>
-                <p className="text-sm text-purple-100">Always here to help</p>
+        <>
+          {/* Mobile backdrop */}
+          <div
+            className="fixed inset-0 sm:hidden z-40 bg-black bg-opacity-30 transition-opacity duration-300"
+            onClick={() => setIsOpen(false)}
+          />
+          
+          {/* Chat Panel */}
+          <div className="fixed bottom-0 left-0 right-0 sm:bottom-auto sm:right-4 sm:left-auto z-50 sm:top-auto w-full sm:w-80 md:w-96 max-w-full bg-white rounded-t-3xl sm:rounded-2xl shadow-2xl border-t sm:border border-gray-200 flex flex-col h-[80vh] sm:h-[600px] md:h-[650px] overflow-hidden">
+            {/* Header */}
+            <div className="bg-gradient-to-r from-purple-600 to-blue-600 text-white px-4 sm:px-6 py-4 sm:py-5 flex-shrink-0 flex items-center justify-between">
+              <div className="flex-1">
+                <h3 className="font-bold text-base sm:text-lg leading-tight">CareerMentor Assistant</h3>
+                <p className="text-xs sm:text-sm text-purple-100 mt-1">Always here to help</p>
               </div>
-              <div className="w-10 h-10 rounded-full bg-white bg-opacity-20 flex items-center justify-center text-lg">
-                🎯
-              </div>
-            </div>
-          </div>
-
-          {/* Messages Container */}
-          <div className="flex-1 overflow-y-auto p-6 space-y-4 bg-gray-50">
-            {messages.map((msg, idx) => (
-              <div key={idx} className={`flex ${msg.type === 'user' ? 'justify-end' : 'justify-start'}`}>
-                <div
-                  className={`max-w-xs lg:max-w-md px-5 py-3 rounded-2xl ${
-                    msg.type === 'user'
-                      ? 'bg-gradient-to-r from-purple-600 to-blue-600 text-white rounded-br-none shadow-md'
-                      : 'bg-white text-slate-900 rounded-bl-none border-2 border-gray-200 shadow-sm'
-                  }`}
-                >
-                  <p className={`text-sm leading-relaxed ${msg.type === 'user' ? 'text-white' : 'text-slate-900'}`}>
-                    {msg.content}
-                  </p>
-                  {msg.results && msg.results.length > 0 && (
-                    <div className="mt-4 space-y-2 pt-4 border-t border-gray-300">
-                      {msg.results.map((result, i) => (
-                        <a
-                          key={i}
-                          href={result.url}
-                          className="flex items-start gap-2 p-3 rounded-lg bg-gray-100 hover:bg-gradient-to-r hover:from-purple-100 hover:to-blue-100 transition group"
-                        >
-                          <span className="text-lg flex-shrink-0">📌</span>
-                          <div>
-                            <p className="font-bold text-slate-900 text-xs group-hover:text-purple-600 transition">
-                              {result.title}
-                            </p>
-                            <p className="text-xs text-gray-600 line-clamp-2">{result.content.substring(0, 60)}...</p>
-                          </div>
-                        </a>
-                      ))}
-                    </div>
-                  )}
-                </div>
-              </div>
-            ))}
-            {isLoading && (
-              <div className="flex justify-start">
-                <div className="bg-white border-2 border-gray-200 text-slate-900 px-5 py-3 rounded-2xl rounded-bl-none shadow-sm">
-                  <div className="flex gap-2 items-center">
-                    <div className="w-2 h-2 bg-purple-600 rounded-full animate-bounce"></div>
-                    <div className="w-2 h-2 bg-purple-600 rounded-full animate-bounce" style={{ animationDelay: '0.1s' }}></div>
-                    <div className="w-2 h-2 bg-purple-600 rounded-full animate-bounce" style={{ animationDelay: '0.2s' }}></div>
-                  </div>
-                </div>
-              </div>
-            )}
-            <div ref={messagesEndRef} />
-          </div>
-
-          {/* Input Area */}
-          <form onSubmit={handleSendMessage} className="border-t border-gray-200 p-4 bg-white flex-shrink-0">
-            <div className="flex gap-2">
-              <input
-                type="text"
-                value={input}
-                onChange={(e) => setInput(e.target.value)}
-                placeholder="Ask a question..."
-                className="flex-1 px-4 py-3 rounded-xl border-2 border-gray-300 focus:border-purple-500 focus:outline-none text-sm text-slate-900 placeholder-gray-500 font-medium transition"
-                disabled={isLoading}
-              />
               <button
-                type="submit"
-                disabled={isLoading}
-                className="bg-gradient-to-r from-purple-600 to-blue-600 hover:from-purple-700 hover:to-blue-700 text-white px-4 py-3 rounded-xl transition disabled:opacity-50 font-bold text-sm shadow-md transform hover:scale-105"
+                onClick={() => setIsOpen(false)}
+                className="sm:hidden ml-2 p-2 hover:bg-white hover:bg-opacity-20 rounded-lg transition"
+                aria-label="Close chat"
               >
                 <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 19l9 2-9-18-9 18 9-2zm0 0v-8" />
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
                 </svg>
               </button>
             </div>
-          </form>
-        </div>
+
+            {/* Messages Container */}
+            <div className="flex-1 overflow-y-auto p-3 sm:p-4 space-y-3 sm:space-y-4 bg-gradient-to-b from-white to-gray-50">
+              {messages.map((msg, idx) => (
+                <div key={idx} className={`flex ${msg.type === 'user' ? 'justify-end' : 'justify-start'} animate-fadeIn`}>
+                  <div
+                    className={`max-w-xs px-3 sm:px-4 py-2 sm:py-3 rounded-2xl text-sm sm:text-base leading-relaxed ${
+                      msg.type === 'user'
+                        ? 'bg-gradient-to-r from-purple-600 to-blue-600 text-white rounded-br-none shadow-md'
+                        : 'bg-white text-slate-900 rounded-bl-none border border-gray-200 shadow-sm'
+                    }`}
+                  >
+                    <p className="break-words whitespace-pre-wrap">{msg.content}</p>
+                    {msg.results && msg.results.length > 0 && (
+                      <div className="mt-2 sm:mt-3 space-y-2 pt-2 sm:pt-3 border-t border-gray-300">
+                        {msg.results.map((result, i) => (
+                          <a
+                            key={i}
+                            href={result.url}
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            className="flex items-start gap-2 p-2 rounded-lg bg-gradient-to-r from-purple-50 to-blue-50 hover:from-purple-100 hover:to-blue-100 transition group"
+                          >
+                            <span className="text-base flex-shrink-0 mt-0.5">📌</span>
+                            <div className="flex-1 min-w-0">
+                              <p className="font-bold text-slate-900 text-xs group-hover:text-purple-600 transition break-words">
+                                {result.title}
+                              </p>
+                              <p className="text-xs text-gray-600 line-clamp-2 break-words">{result.content.substring(0, 60)}...</p>
+                            </div>
+                          </a>
+                        ))}
+                      </div>
+                    )}
+                  </div>
+                </div>
+              ))}
+              {isLoading && (
+                <div className="flex justify-start animate-fadeIn">
+                  <div className="bg-white border border-gray-200 text-slate-900 px-4 py-3 rounded-2xl rounded-bl-none shadow-sm">
+                    <div className="flex gap-1.5 items-center">
+                      <div className="w-2 h-2 bg-purple-600 rounded-full animate-bounce"></div>
+                      <div className="w-2 h-2 bg-purple-600 rounded-full animate-bounce" style={{ animationDelay: '0.1s' }}></div>
+                      <div className="w-2 h-2 bg-purple-600 rounded-full animate-bounce" style={{ animationDelay: '0.2s' }}></div>
+                    </div>
+                  </div>
+                </div>
+              )}
+              <div ref={messagesEndRef} />
+            </div>
+
+            {/* Input Area */}
+            <form onSubmit={handleSendMessage} className="border-t border-gray-200 px-3 sm:px-4 py-3 sm:py-4 bg-white flex-shrink-0">
+              <div className="flex gap-2 items-center">
+                <input
+                  type="text"
+                  value={input}
+                  onChange={(e) => setInput(e.target.value)}
+                  placeholder="Ask a question..."
+                  className="flex-1 px-3 sm:px-4 py-2 sm:py-2.5 rounded-xl border border-gray-300 focus:border-purple-500 focus:outline-none focus:ring-2 focus:ring-purple-200 text-sm bg-white text-slate-900 placeholder-gray-500 font-medium transition"
+                  disabled={isLoading}
+                  aria-label="Message input"
+                />
+                <button
+                  type="submit"
+                  disabled={isLoading || !input.trim()}
+                  className="bg-gradient-to-r from-purple-600 to-blue-600 hover:from-purple-700 hover:to-blue-700 disabled:from-gray-400 disabled:to-gray-400 text-white px-3 sm:px-4 py-2 sm:py-2.5 rounded-xl transition disabled:opacity-60 disabled:cursor-not-allowed font-bold text-sm shadow-md transform hover:scale-105 active:scale-95 flex items-center justify-center flex-shrink-0"
+                  aria-label="Send message"
+                  title={isLoading ? 'Loading...' : 'Send message'}
+                >
+                  <svg className="w-4 h-4 sm:w-5 sm:h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M12 19l9 2-9-18-9 18 9-2zm0 0v-8" />
+                  </svg>
+                </button>
+              </div>
+            </form>
+          </div>
+        </>
       )}
+
+      <style jsx>{`
+        @keyframes fadeIn {
+          from {
+            opacity: 0;
+            transform: translateY(10px);
+          }
+          to {
+            opacity: 1;
+            transform: translateY(0);
+          }
+        }
+        .animate-fadeIn {
+          animation: fadeIn 0.3s ease-out;
+        }
+      `}</style>
     </>
   );
 }
