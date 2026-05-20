@@ -130,30 +130,32 @@ export async function POST(request: NextRequest) {
     // Define keywords for different intents
     const keywordMap: { [key: string]: string[] } = {
       interview: ['interview', 'prep', 'questions', 'technical', 'behavioral', 'mock', 'screening'],
-      mentoring: ['mentoring', 'mentor', 'expert', 'coach', 'guidance', 'experienced'],
-      coaching: ['coaching', 'program', 'leadership', 'career', 'transition', 'startup'],
-      tools: ['tool', 'tools', 'marketplace', 'builder', 'optimizer', 'system', 'design'],
-      pricing: ['price', 'pricing', 'cost', 'free', 'money', 'pay', 'afford', 'bundle'],
-      resume: ['resume', 'cv', 'profile', 'linkedin', 'atp'],
-      questions: ['question', 'answer', 'database', 'video'],
-      general: ['service', 'product', 'offer', 'have', 'do', 'help', 'what']
+      mentoring: ['mentoring', 'mentor', 'expert', 'coach', 'guidance', 'experienced', 'session'],
+      coaching: ['coaching', 'program', 'leadership', 'career', 'transition', 'startup', 'intensive'],
+      tools: ['tool', 'tools', 'marketplace', 'builder', 'optimizer', 'system', 'design', 'database'],
+      pricing: ['price', 'pricing', 'cost', 'free', 'money', 'pay', 'afford', 'bundle', 'how much'],
+      resume: ['resume', 'cv', 'profile', 'linkedin', 'atp', 'attract'],
+      questions: ['question', 'answer', 'database', 'video', 'solutions'],
+      getstarted: ['start', 'begin', 'get started', 'sign up', 'create', 'account', 'book', 'purchase'],
+      general: ['service', 'product', 'offer', 'have', 'do', 'help', 'what', 'else', 'anything']
     };
     
     // Detect intent from query
     const detectedIntents: string[] = [];
     Object.entries(keywordMap).forEach(([intent, keywords]) => {
-      if (keywords.some((keyword: string) => queryWords.includes(keyword))) {
+      if (keywords.some((keyword: string) => searchQuery.includes(keyword))) {
         detectedIntents.push(intent);
       }
     });
 
-    const results = knowledgeBase
+    const scoredResults = knowledgeBase
       .map(item => {
         const titleLower = item.title.toLowerCase();
         const contentLower = item.content.toLowerCase();
         let score = 0;
         
         // Exact phrase match
+        if (titleLower === searchQuery) score += 20;
         if (titleLower.includes(searchQuery)) score += 15;
         if (contentLower.includes(searchQuery)) score += 10;
         
@@ -165,40 +167,69 @@ export async function POST(request: NextRequest) {
           }
         });
         
-        // Intent-based matching
+        // Intent-based matching with category boost
         detectedIntents.forEach(intent => {
           const itemTitle = titleLower;
-          const itemContent = contentLower;
           const itemCategory = item.category?.toLowerCase();
           
-          if (intent === 'interview' && (itemTitle.includes('interview') || itemCategory === 'tools')) score += 4;
-          if (intent === 'mentoring' && (itemTitle.includes('mentor') || itemCategory === 'services')) score += 4;
-          if (intent === 'coaching' && itemTitle.includes('coaching')) score += 4;
-          if (intent === 'tools' && (itemCategory === 'tools' || itemTitle.includes('marketplace'))) score += 4;
-          if (intent === 'pricing' && (itemCategory === 'pricing' || itemContent.includes('price') || itemContent.includes('cost'))) score += 6;
-          if (intent === 'resume' && (itemTitle.includes('resume') || itemTitle.includes('linkedin'))) score += 5;
-          if (intent === 'questions' && itemTitle.includes('question')) score += 5;
+          if (intent === 'interview' && itemTitle.includes('interview')) score += 8;
+          if (intent === 'interview' && itemCategory === 'tools' && !itemTitle.includes('linkedin')) score += 3;
+          if (intent === 'mentoring' && itemTitle.includes('mentor')) score += 8;
+          if (intent === 'coaching' && itemTitle.includes('coaching')) score += 8;
+          if (intent === 'tools' && itemCategory === 'tools') score += 8;
+          if (intent === 'tools' && itemTitle.includes('marketplace')) score += 6;
+          if (intent === 'pricing' && itemCategory === 'pricing') score += 8;
+          if (intent === 'resume' && (itemTitle.includes('resume') || itemTitle.includes('linkedin'))) score += 8;
+          if (intent === 'questions' && itemTitle.includes('question')) score += 8;
+          if (intent === 'getstarted' && itemTitle.includes('started')) score += 8;
         });
         
         return { item, score };
       })
       .filter(({ score }) => score > 0)
-      .sort((a, b) => b.score - a.score)
-      .slice(0, detectedIntents.length > 0 ? 2 : 3)
+      .sort((a, b) => b.score - a.score);
+    
+    // Deduplicate and ensure variety
+    const seenTitles = new Set<string>();
+    const results = scoredResults
+      .filter(({ item }) => {
+        if (seenTitles.has(item.title)) {
+          return false;
+        }
+        seenTitles.add(item.title);
+        return true;
+      })
+      .slice(0, 2)
       .map(({ item }) => ({
         title: item.title,
         content: item.content,
         url: item.url
       }));
 
-    // If still no results, provide helpful suggestions
-    const finalResults = results.length > 0 ? results : [
-      {
-        title: 'Our Main Services',
-        content: 'We offer Interview Preparation, Mentoring Programs, Professional Coaching, and a Tool Marketplace. What would you like to know more about?',
-        url: '/'
+    // If no specific match, provide contextual suggestions
+    let finalResults = results;
+    
+    if (results.length === 0) {
+      // Check what they're asking about
+      if (detectedIntents.includes('general') || queryWords.some((w: string) => ['else', 'anything', 'what'].includes(w))) {
+        finalResults = knowledgeBase
+          .filter(item => item.category === 'services')
+          .slice(0, 2)
+          .map(item => ({
+            title: item.title,
+            content: item.content,
+            url: item.url
+          }));
+      } else {
+        finalResults = [
+          {
+            title: 'Our Services',
+            content: 'We offer Interview Preparation, Mentoring Programs, Professional Coaching, and a Tool Marketplace. Ask me about any of these for more details!',
+            url: '/'
+          }
+        ];
       }
-    ];
+    }
 
     const response = NextResponse.json(
       {
