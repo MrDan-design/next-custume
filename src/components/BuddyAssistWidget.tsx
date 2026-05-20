@@ -83,7 +83,8 @@ export default function BuddyAssistWidget() {
       {/* Chat Button */}
       <button
         onClick={() => setIsOpen(!isOpen)}
-        className="fixed bottom-4 right-4 sm:bottom-6 sm:right-6 z-[9999] w-14 h-14 sm:w-16 sm:h-16 rounded-full bg-gradient-to-br from-purple-600 to-blue-600 text-white shadow-lg hover:shadow-xl transition-all duration-300 hover:scale-110 flex items-center justify-center border-4 border-white"
+        className="fixed bottom-4 right-4 sm:bottom-6 sm:right-6 w-14 h-14 sm:w-16 sm:h-16 rounded-full bg-gradient-to-br from-purple-600 to-blue-600 text-white shadow-lg hover:shadow-xl transition-all duration-300 hover:scale-110 flex items-center justify-center border-4 border-white"
+        style={{ zIndex: 9999 }}
       >
         {isOpen ? (
           <svg className="w-6 h-6 sm:w-7 sm:h-7" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -100,12 +101,13 @@ export default function BuddyAssistWidget() {
         <>
           {/* Backdrop */}
           <div
-            className="fixed inset-0 sm:hidden z-[9998] bg-black/30"
+            className="fixed inset-0 sm:hidden bg-black/30"
             onClick={() => setIsOpen(false)}
+            style={{ zIndex: 9998 }}
           />
 
           {/* Chat Panel */}
-          <div className="fixed bottom-0 left-0 right-0 sm:bottom-auto sm:right-4 sm:left-auto z-[9999] sm:top-auto w-full sm:w-80 md:w-96 max-h-[80vh] sm:max-h-[650px] bg-white rounded-t-3xl sm:rounded-2xl shadow-2xl border-t sm:border border-gray-200 flex flex-col animate-slideUp">
+          <div className="fixed bottom-0 left-0 right-0 sm:bottom-auto sm:right-4 sm:left-auto sm:top-auto w-full sm:w-80 md:w-96 max-h-[80vh] sm:max-h-[650px] bg-white rounded-t-3xl sm:rounded-2xl shadow-2xl border-t sm:border border-gray-200 flex flex-col animate-slideUp" style={{ zIndex: 9999 }}>
             {/* Badge */}
             <div className="bg-gradient-to-r from-purple-700 to-blue-700 text-white px-4 sm:px-6 py-2 text-center text-xs font-semibold">
               ✨ Powered by Buddy Assist
