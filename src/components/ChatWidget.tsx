@@ -148,7 +148,7 @@ export default function ChatWidget() {
               display: 'flex',
               flexDirection: 'column',
               gap: '12px',
-              backgroundColor: '#f9fafb'
+              backgroundColor: '#ffffff'
             }}
           >
             {messages.map(msg => (
@@ -191,7 +191,8 @@ export default function ChatWidget() {
                     backgroundColor: 'white',
                     border: '1px solid #e5e7eb',
                     display: 'flex',
-                    gap: '4px'
+                    gap: '4px',
+                    color: '#6b7280'
                   }}
                 >
                   <span style={{ animation: 'bounce 1.4s infinite' }}>●</span>
@@ -225,6 +226,8 @@ export default function ChatWidget() {
                 borderRadius: '8px',
                 fontSize: '14px',
                 fontFamily: 'inherit',
+                color: '#1f2937',
+                backgroundColor: 'white',
                 opacity: isLoading ? 0.6 : 1,
                 cursor: isLoading ? 'not-allowed' : 'text'
               }}
