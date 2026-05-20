@@ -5,7 +5,7 @@ import { useState } from 'react';
 
 export default function DashboardPage() {
   const [activeTab, setActiveTab] = useState('overview');
-  const [userName] = useState('John Doe');
+  const [userName] = useState('Daniel');
 
   const upcomingSessions = [
     { id: 1, type: 'Interview Prep', mentor: 'Sarah Chen', date: '2026-05-25', time: '2:00 PM', status: 'Confirmed' },
