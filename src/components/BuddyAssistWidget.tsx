@@ -107,9 +107,15 @@ export default function BuddyAssistWidget() {
 
       {/* Chat Panel */}
       <div
-        className={`fixed bottom-0 left-0 right-0 sm:bottom-auto sm:right-4 sm:left-auto z-[9999] sm:top-auto w-full sm:w-80 md:w-96 bg-white rounded-t-3xl sm:rounded-2xl shadow-2xl border-t sm:border border-gray-200 flex flex-col transition-all duration-300 ${
-          isOpen ? 'h-[80vh] sm:h-[650px]' : 'h-0'
-        } overflow-hidden ${!isOpen ? 'pointer-events-none' : ''}`}
+        className={`fixed bottom-0 left-0 right-0 sm:bottom-auto sm:right-4 sm:left-auto z-[9999] sm:top-auto w-full sm:w-80 md:w-96 bg-white rounded-t-3xl sm:rounded-2xl shadow-2xl border-t sm:border border-gray-200 flex flex-col transition-all duration-300 ease-out ${
+          isOpen 
+            ? 'h-[80vh] sm:h-[650px] opacity-100 visible' 
+            : 'h-0 opacity-0 invisible sm:pointer-events-none'
+        }`}
+        style={{
+          transform: isOpen ? 'translateY(0)' : 'translateY(100%)',
+          transition: 'all 300ms ease-out'
+        }}
       >
         {/* Powered By Badge */}
         <div className="bg-gradient-to-r from-purple-700 to-blue-700 text-white px-4 sm:px-6 py-2 flex-shrink-0 text-center">
