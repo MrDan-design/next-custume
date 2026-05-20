@@ -77,6 +77,23 @@ const knowledgeBase = [
   }
 ];
 
+// Helper function to add CORS headers
+function corsHeaders(response: NextResponse) {
+  response.headers.set('Access-Control-Allow-Origin', '*');
+  response.headers.set('Access-Control-Allow-Methods', 'POST, GET, OPTIONS');
+  response.headers.set('Access-Control-Allow-Headers', 'Content-Type, X-BuddyAssist-Signature');
+  return response;
+}
+
+export async function GET() {
+  // Health check endpoint for Buddy Assist
+  const response = NextResponse.json(
+    { status: 'ok', message: 'Buddy Assist endpoint is working' },
+    { status: 200 }
+  );
+  return corsHeaders(response);
+}
+
 export async function POST(request: NextRequest) {
   try {
     const body = await request.text();
@@ -86,10 +103,11 @@ export async function POST(request: NextRequest) {
     // Verify signature if secret is configured
     if (secret !== 'your-secret-key') {
       if (!verifySignature(body, signature, secret)) {
-        return NextResponse.json(
+        const response = NextResponse.json(
           { error: 'Invalid signature' },
           { status: 401 }
         );
+        return corsHeaders(response);
       }
     }
 
@@ -98,10 +116,11 @@ export async function POST(request: NextRequest) {
 
     // Validate project ID
     if (project_id !== '6a0cf9eeaddb33fba4b3ca4a') {
-      return NextResponse.json(
+      const response = NextResponse.json(
         { error: 'Invalid project ID' },
         { status: 400 }
       );
+      return corsHeaders(response);
     }
 
     // Simple search through knowledge base
@@ -119,7 +138,7 @@ export async function POST(request: NextRequest) {
         url: item.url
       }));
 
-    return NextResponse.json(
+    const response = NextResponse.json(
       {
         results: results.length > 0 ? results : [
           {
@@ -131,14 +150,21 @@ export async function POST(request: NextRequest) {
       },
       { status: 200 }
     );
+    return corsHeaders(response);
   } catch (error) {
     console.error('Buddy Assist API error:', error);
-    return NextResponse.json(
+    const response = NextResponse.json(
       { 
         results: [],
         error: 'Failed to process query'
       },
       { status: 500 }
     );
+    return corsHeaders(response);
   }
+}
+
+export async function OPTIONS() {
+  const response = NextResponse.json({ status: 'ok' }, { status: 200 });
+  return corsHeaders(response);
 }
