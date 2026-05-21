@@ -1,0 +1,13 @@
+name: Sync Docs
+on: [push]
+jobs:
+  sync:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+      - name: Push docs to Buddy Assist
+        run: |
+          curl -X POST https://docassist-tcylx.ondigitalocean.app/api/v1/documentation/6a0cf9eeaddb33fba4b3ca4a/webhook-ingest \
+            -H "Content-Type: application/json" \
+            -H "x-webhook-token: ${{ secrets.BUDDYASSIST_TOKEN }}" \
+            -d "{\"documents\":[{\"title\":\"README\",\"content\":\"$(cat README.md | tr '\n' ' ')\",\"doc_type\":\"guide\"}]}"
